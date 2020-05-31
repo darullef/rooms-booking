@@ -1,5 +1,5 @@
 app:
   datasource:
-    jdbc-url: jdbc:postgresql://localhost:5432/rmdb
+    jdbc-url: jdbc:postgresql://localhost:5432/rbdb
     username: drlf
     password: bezhasla1

@@ -4,7 +4,6 @@ package com.darullef.roomsbooking.service;
 import com.darullef.roomsbooking.model.Room;
 import com.darullef.roomsbooking.dao.RoomDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,8 +14,6 @@ public class RoomService {
 
     @Autowired
     private RoomDao roomDao;
-
-    private JdbcTemplate jdbcTemplate;
 
     public void createRoom(Room room) {
         roomDao.save(room);

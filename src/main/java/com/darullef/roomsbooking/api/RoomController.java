@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("api/room")
-public class RoomControler {
+public class RoomController {
 
     @Autowired
     private RoomService roomService;
