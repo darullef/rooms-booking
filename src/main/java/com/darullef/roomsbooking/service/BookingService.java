@@ -1,7 +1,9 @@
 package com.darullef.roomsbooking.service;
 
 import com.darullef.roomsbooking.dao.BookingDao;
+import com.darullef.roomsbooking.dao.RoomDao;
 import com.darullef.roomsbooking.model.Booking;
+import com.darullef.roomsbooking.model.Room;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +15,11 @@ public class BookingService {
 
     @Autowired
     private BookingDao bookingDao;
+    @Autowired
+    private RoomDao roomDao;
 
     public void createBooking(Booking booking) {
+        booking.getRoom().add(new Room((long) 1, "123", 4, true));
         bookingDao.save(booking);
     }
 

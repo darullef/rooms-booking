@@ -5,16 +5,23 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table
+@Table(name = "room")
 public class Room {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
+
     @NotBlank
+    @Column(name = "number")
     private String number;
+
     @NotNull
+    @Column(name = "capacity")
     private int capacity;
+
+    @Column(name = "has_projector")
     private boolean hasProjector;
 
     public Room() {}

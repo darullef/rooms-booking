@@ -21,6 +21,7 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<?> addBooking(@Valid @RequestBody Booking booking) {
+
         bookingService.createBooking(booking);
         return new ResponseEntity<>(booking, HttpStatus.CREATED);
     }
