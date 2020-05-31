@@ -1,8 +1,7 @@
 package com.darullef.roomsbooking.model;
 
-import org.joda.time.DateTime;
-
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Table
 @Entity
@@ -11,12 +10,12 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private DateTime startTime;
-    private DateTime endTime;
+    private Timestamp startTime;
+    private Timestamp endTime;
 
     public Booking() {}
 
-    public Booking(Long id, DateTime startTime, DateTime endTime) {
+    public Booking(Long id, Timestamp startTime, Timestamp endTime) {
         this.id = id;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -30,19 +29,19 @@ public class Booking {
         this.id = id;
     }
 
-    public DateTime getStartTime() {
+    public Timestamp getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(DateTime startTime) {
+    public void setStartTime(Timestamp startTime) {
         this.startTime = startTime;
     }
 
-    public DateTime getEndTime() {
+    public Timestamp getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(DateTime endTime) {
+    public void setEndTime(Timestamp endTime) {
         this.endTime = endTime;
     }
 }

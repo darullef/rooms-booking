@@ -2,7 +2,6 @@ package com.darullef.roomsbooking.service;
 
 import com.darullef.roomsbooking.dao.BookingDao;
 import com.darullef.roomsbooking.model.Booking;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,6 @@ public class BookingService {
     private BookingDao bookingDao;
 
     public void createBooking(Booking booking) {
-        booking.setStartTime(DateTime.parse(booking.getStartTime().toString()));
-        booking.setEndTime(DateTime.parse(booking.getEndTime().toString()));
         bookingDao.save(booking);
     }
 
