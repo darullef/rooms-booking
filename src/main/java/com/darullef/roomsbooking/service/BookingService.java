@@ -3,12 +3,15 @@ package com.darullef.roomsbooking.service;
 import com.darullef.roomsbooking.dao.BookingDao;
 import com.darullef.roomsbooking.dao.RoomDao;
 import com.darullef.roomsbooking.model.Booking;
-import com.darullef.roomsbooking.model.Room;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class BookingService {
@@ -18,9 +21,24 @@ public class BookingService {
     @Autowired
     private RoomDao roomDao;
 
-    public void createBooking(Booking booking) {
-        booking.getRoom().add(new Room((long) 1, "123", 4, true));
+    public Booking createBooking(Timestamp startTime, Timestamp endTime, List<Long> rooms) {
+        Booking booking = new Booking();
+        booking.setStartTime(startTime);
+        booking.setEndTime(endTime);
+        Long roomIdForException = (long) 0;
+
+        try {
+            for(Long room_id : rooms) {
+                roomIdForException = room_id;
+                booking.getRoom().add(roomDao.findById(room_id).get());
+            }
+        } catch (NoSuchElementException ex ) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Room with id " + roomIdForException + " does not exist");
+        }
+
         bookingDao.save(booking);
+        return booking;
     }
 
     public List<Booking> getAllBookings() {
