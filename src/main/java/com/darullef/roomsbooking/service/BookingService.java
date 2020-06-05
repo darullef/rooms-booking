@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -21,6 +20,7 @@ public class BookingService {
     @Autowired
     private RoomDao roomDao;
 
+
     public Booking createBooking(Timestamp startTime, Timestamp endTime, List<Long> rooms) {
         Booking booking = new Booking();
         booking.setStartTime(startTime);
@@ -30,7 +30,7 @@ public class BookingService {
         try {
             for(Long room_id : rooms) {
                 roomIdForException = room_id;
-                booking.getRoom().add(roomDao.findById(room_id).get());
+                booking.getRooms().add(roomDao.findById(room_id).get());
             }
         } catch (NoSuchElementException ex ) {
             throw new ResponseStatusException(
@@ -41,11 +41,21 @@ public class BookingService {
         return booking;
     }
 
-    public List<Booking> getAllBookings() {
-        return new ArrayList<>(bookingDao.findAll());
+    public List<Booking> returnAllBookings() {
+       if(bookingDao.findAll().isEmpty()) {
+           throw new NoSuchElementException();
+       }
+       return bookingDao.findAll();
     }
 
-    public Booking getBookingById(Long id) {
+    public List<Booking> returnAllBookingsInTime(Timestamp start, Timestamp end) {
+        if(bookingDao.findAllByStartTimeAfterAndEndTimeBefore(start, end).isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return bookingDao.findAllByStartTimeAfterAndEndTimeBefore(start, end);
+    }
+
+    public Booking returnBookingById(Long id) {
         return bookingDao.findById(id).get();
     }
 
@@ -58,5 +68,4 @@ public class BookingService {
     public void deleteBooking(Long id) {
         bookingDao.delete(bookingDao.findById(id).get());
     }
-
 }

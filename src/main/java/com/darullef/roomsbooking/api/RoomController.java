@@ -26,18 +26,52 @@ public class RoomController {
     }
 
     @GetMapping
-    public List<Room> getAllRooms() {
-        return roomService.getAllRooms();
+    public ResponseEntity<?> getAllRooms() {
+        try {
+            List<Room> rooms = roomService.getAllRooms();
+            return new ResponseEntity<>(rooms, HttpStatus.OK);
+        } catch (NoSuchElementException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "No rooms exist");
+        }
     }
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<?> getRoomById(@PathVariable("id") Long id) {
         try {
             Room room = roomService.getRoomById(id);
-            return new ResponseEntity<Room>(room, HttpStatus.OK);
+            return new ResponseEntity<>(room, HttpStatus.OK);
         } catch (NoSuchElementException ex) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Room with id " + id + " does not exist");
+        }
+    }
+
+    @GetMapping(path = "/booked")
+    public ResponseEntity<?> getAllBookedRooms() {
+        List<Room> rooms= roomService.getAllBookedRooms();
+        return new ResponseEntity<>(rooms, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/capacity")
+    public ResponseEntity<?> getAllRoomsWhereCapacityBetween(@RequestParam int from, @RequestParam int to) {
+        try {
+            List<Room> rooms = roomService.getAllRoomsWhereCapacityBetween(from, to);
+            return new ResponseEntity<>(rooms, HttpStatus.OK);
+        } catch (NoSuchElementException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "No rooms exist with given parameters");
+        }
+    }
+
+    @GetMapping(path = "/projector")
+    public ResponseEntity<?> getAllRoomsByHasProjector(@RequestParam boolean has) {
+        try {
+            List<Room> rooms = roomService.getAllRoomsWithProjector(has);
+            return new ResponseEntity<>(rooms, HttpStatus.OK);
+        } catch (NoSuchElementException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "No rooms exist with given parameters");
         }
     }
 

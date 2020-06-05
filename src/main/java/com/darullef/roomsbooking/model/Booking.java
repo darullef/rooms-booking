@@ -20,7 +20,7 @@ public class Booking {
     @Column(name = "end_time")
     private Timestamp endTime;
 
-    @OneToMany(targetEntity = Room.class)
+    @ManyToMany(targetEntity = Room.class)
     private List<Room> rooms = new ArrayList<>();
 
     public Booking() {}
@@ -56,11 +56,13 @@ public class Booking {
         this.endTime = endTime;
     }
 
-    public List<Room> getRoom() {
+    public List<Room> getRooms() {
         return rooms;
     }
 
-    public void setRoom(List<Room> room) {
+    public void setRooms(List<Room> room) {
         this.rooms = room;
     }
+
+
 }

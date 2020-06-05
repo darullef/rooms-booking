@@ -13,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.Valid;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,13 +45,13 @@ public class BookingController {
 
     @GetMapping
     public List<Booking> getAllBookings() {
-        return bookingService.getAllBookings();
+        return bookingService.returnAllBookings();
     }
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<?> getBookingById(@PathVariable("id") Long id) {
         try {
-            Booking booking = bookingService.getBookingById(id);
+            Booking booking = bookingService.returnBookingById(id);
             return new ResponseEntity<Booking>(booking, HttpStatus.OK);
         } catch (NoSuchElementException ex) {
             throw new ResponseStatusException(
@@ -61,10 +59,21 @@ public class BookingController {
         }
     }
 
+    @GetMapping(path = "date")
+    public ResponseEntity<?> getBookingsInTime(@RequestParam Timestamp start, @RequestParam Timestamp end) {
+        try {
+            List<Booking> bookings = bookingService.returnAllBookingsInTime(start, end);
+            return new ResponseEntity<>(bookings, HttpStatus.OK);
+        } catch (NoSuchElementException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "No bookings found in this time");
+        }
+    }
+
     @PutMapping(path = "/{id}")
     public ResponseEntity<?> updateRoom(@PathVariable("id") Long id, @RequestBody Booking newBooking) {
         try {
-            Booking booking = bookingService.getBookingById(id);
+            Booking booking = bookingService.returnBookingById(id);
             bookingService.updateBooking(booking, newBooking);
             return new ResponseEntity<>(booking, HttpStatus.OK);
         } catch (NoSuchElementException ex) {
