@@ -6,6 +6,7 @@ import com.darullef.roomsbooking.dao.RoomDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 @Service
@@ -36,11 +37,30 @@ public class RoomService {
         for(Booking b : bookingService.returnAllBookings()){
             rooms.addAll(b.getRooms());
         }
-//        it makes rooms' values unique
-//        Set<Room> roomSet = new HashSet<>(rooms);
-//        rooms.clear();
-//        rooms.addAll(roomSet);
-        return rooms;
+        Set<Room> roomSet = new HashSet<>(rooms);
+        rooms.clear();
+        rooms.addAll(roomSet);
+
+        if(rooms.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        else return rooms;
+    }
+
+    public List<Room> getAllFreeRoomsInTime(Timestamp start, Timestamp end) {
+        List<Room> allRooms = roomDao.findAll();
+        List<Room> bookedRooms = new ArrayList<>();
+        for(Booking b : bookingService.returnAllBookingsInTime(start, end)) {
+            bookedRooms.addAll(b.getRooms());
+        }
+        for(Room bRoom : bookedRooms) {
+            allRooms.removeIf(room -> room.equals(bRoom));
+        }
+
+        if(allRooms.isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        else return allRooms;
     }
 
     public List<Room> getAllRoomsWhereCapacityBetween(int n, int m) {

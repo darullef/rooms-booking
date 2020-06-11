@@ -44,8 +44,14 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<Booking> getAllBookings() {
-        return bookingService.returnAllBookings();
+    public ResponseEntity<?> getAllBookings() {
+        try {
+            List<Booking> bookings = bookingService.returnAllBookings();
+            return new ResponseEntity<>(bookings, HttpStatus.OK);
+        } catch (NoSuchElementException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "No bookings exists.");
+        }
     }
 
     @GetMapping(path = "/{id}")
