@@ -10,12 +10,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 @RestController
 @RequestMapping("api/room")
@@ -28,17 +27,6 @@ public class RoomController {
     public ResponseEntity<?> addRoom(@Valid @RequestBody Room room) {
         roomService.createRoom(room);
         return new ResponseEntity<>(room, HttpStatus.CREATED);
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getAllRooms() {
-        try {
-            List<Room> rooms = roomService.getAllRooms();
-            return new ResponseEntity<>(rooms, HttpStatus.OK);
-        } catch (NoSuchElementException ex) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "No rooms exist");
-        }
     }
 
     @GetMapping(path = "/{id}")
@@ -54,34 +42,41 @@ public class RoomController {
 
     @GetMapping(path = "/booked")
     public ResponseEntity<?> getAllBookedRooms() {
-        List<Room> rooms= roomService.getAllBookedRooms();
-        return new ResponseEntity<>(rooms, HttpStatus.OK);
+        try {
+            List<Room> rooms = roomService.getAllBookedRooms();
+            return new ResponseEntity<>(rooms, HttpStatus.OK);
+        } catch (NoSuchElementException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "No booked rooms exists");
+        }
     }
 
-    @GetMapping(path = "/f")
-    public ResponseEntity<?> filterRooms(@RequestParam Map<String,String> allParams) {
-        List<Room> rooms = new ArrayList<>();
+    @GetMapping
+    public ResponseEntity<?> filterRooms(@RequestParam Map<String, String> allParams) {
+        try {
+            List<Room> rooms = roomService.getAllRooms();
+            //capacity: from, to;   date: start, end;   projector: has
+            if (allParams.containsKey("has")) {
+                boolean x = Boolean.parseBoolean(allParams.get("has"));
+                rooms.retainAll(roomService.getAllRoomsWithProjector(x));
+            }
+            if (allParams.containsKey("from") || allParams.containsKey("to")) {
+                int from = Integer.parseInt(allParams.get("from"));
+                int to = Integer.parseInt(allParams.get("to"));
 
-        //capacity: from, to;   date: start, end;   projector: has
-        if(allParams.containsKey("has")) {
-            boolean x = Boolean.parseBoolean(allParams.get("has"));
-            rooms =  Stream.concat(rooms.stream(), roomService.getAllRoomsWithProjector(x).stream())
-                    .collect(Collectors.toList());
-        }
-        if(allParams.containsKey("from") || allParams.containsKey("to")) {
-            int from = Integer.parseInt(allParams.get("from"));
-            int to = Integer.parseInt(allParams.get("to"));
-            rooms =  Stream.concat(rooms.stream(), roomService.getAllRoomsWhereCapacityBetween(from, to).stream())
-                    .collect(Collectors.toList());
-        }
-        if(allParams.containsKey("start") || allParams.containsKey("end")) {
-            Timestamp start = Timestamp.valueOf(allParams.get("start"));
-            Timestamp end = Timestamp.valueOf(allParams.get("end"));
-            rooms =  Stream.concat(rooms.stream(), roomService.getAllFreeRoomsInTime(start, end).stream())
-                    .collect(Collectors.toList());
-        }
+                rooms.retainAll(roomService.getAllRoomsWhereCapacityBetween(from, to));
+            }
+            if (allParams.containsKey("start") || allParams.containsKey("end")) {
+                Timestamp start = Timestamp.valueOf(allParams.get("start"));
+                Timestamp end = Timestamp.valueOf(allParams.get("end"));
 
-        return new ResponseEntity<>(rooms, HttpStatus.OK);
+                rooms.retainAll(roomService.getAllFreeRoomsInTime(start, end));
+            }
+            return new ResponseEntity<>(rooms, HttpStatus.OK);
+        } catch (NoSuchElementException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "No rooms with given parameters");
+        }
     }
 
     @GetMapping(path = "/fr")
